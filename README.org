@@ -1,0 +1,21 @@
+* Samos Schemer
+
+Library wrapping chibi scheme for C++.
+
+** Build Instructions
+
+Build and install chibi scheme.
+
+   #+BEGIN_SRC bash
+     cd target/debug
+     cmake ../..
+     make
+     ctest
+   #+END_SRC
+
+** Dependencies
+
+   + CMake (FIXME min version)
+   + Google Test (FIXME min version)
+   + chibi-scheme
+   + FIXME other dependencies

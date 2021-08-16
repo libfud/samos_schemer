@@ -1,0 +1,10 @@
+Checks: '-llvmlibc-*,-llvm-header-guard,\
+        .*,-system-headers,\
+        -cppcoreguidelines-pro-bounds-array-to-pointer-decay,\
+        *,\
+        -abseil*,\
+        -google*,\
+        -fuchsia*,\
+        -clang-analyzer-alpha.deadcode.UnreachableCode,\
+        -cert-err60-cpp'
+HeaderFilterRegex: ".*,-system-headers"
