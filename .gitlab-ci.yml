@@ -8,7 +8,6 @@ default:
       gcc binutils
       cmake extra-cmake-modules
       cxxopts-devel utf8cpp-devel
-      eigen3-devel
       spdlog-devel fmt-devel
       gtest-devel gmock-devel
       cppcheck gcovr uncrustify

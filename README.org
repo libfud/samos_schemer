@@ -2,20 +2,25 @@
 
 Library wrapping chibi scheme for C++.
 
+** Dependencies
+
+   + CMake (FIXME min version)
+   + Google Test and gmock (FIXME min version)
+   + [[https://github.com/ashinn/chibi-scheme][chibi-scheme]] (head)
+   + gcc (11.2.1+)
+   + [[https://github.com/jarro2783/cxxopts][cxxopts]] (2.2.1+)
+   + [[https://github.com/nemtrif/utfcpp][utf8cpp]] (3.2.1+)
+   + [[https://github.com/gabime/spdlog][spdlog]] (1.8.5+)
+   + [[https://github.com/fmtlib/fmt][fmt]] (7.1.3+)
+
 ** Build Instructions
 
 Build and install chibi scheme.
 
    #+BEGIN_SRC bash
+     mkdir -p target/debug
      cd target/debug
      cmake ../..
      make
      ctest
    #+END_SRC
-
-** Dependencies
-
-   + CMake (FIXME min version)
-   + Google Test (FIXME min version)
-   + chibi-scheme
-   + FIXME other dependencies
