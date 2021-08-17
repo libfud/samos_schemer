@@ -259,6 +259,11 @@ ConfigResult<> ConfigMap::load_from_sexp(sexp& sexp_config, scheme::Schemer& sch
     return ConfigResult<>::ok({});
 }
 
+const std::set<std::string>& ConfigMap::keys() const
+{
+    return config_keys;
+}
+
 ConfigNest::ConfigNest()
     :
     name{},

@@ -46,7 +46,11 @@ Schemer::Schemer()
 
     environment = sexp_load_standard_env(context, NULL, SEXP_SEVEN);
 
-    sexp_load_standard_ports(context, environment, stdin, stdout, stderr, 1);
+    assert(!sexp_exceptionp(environment));
+
+    sexp res = sexp_load_standard_ports(context, environment, stdin, stdout, stderr, 1);
+
+    assert(!sexp_exceptionp(res));
 }
 
 Schemer::~Schemer()
@@ -111,9 +115,14 @@ SchemerResult<> Schemer::import_module(SchemeModule mod)
     scheme_module_to_sexp(mod, mod_sexp);
 
     import_statement = sexp_list2(context, import_fn, mod_sexp);
-    log::logger::log(log::logger::LogLevel::Debug, "Import Statement: {}", sexp_to_string(import_statement));
 
-    tmp = sexp_eval(context, import_statement, environment);
+    auto import_string = fmt::format(
+        "(with-exception-handler {} (lambda () {}))",
+        "(lambda (exn) (display \"Whoopsie doodles\") #f)",
+        sexp_to_string(import_statement)
+    );
+
+    tmp = sexp_eval_string(context, import_string.c_str(), -1, environment);
     if (sexp_exceptionp(tmp))
     {
         sexp_gc_release4(context);
@@ -422,10 +431,6 @@ void Schemer::chibi_module_to_sexp(ChibiModule mod, sexp& mod_sexp)
         scope_str = "config";
         break;
 
-    case ChibiModule::ChibiCrypto:
-        scope_str = "crypto";
-        break;
-
     case ChibiModule::ChibiCryptoMd5:
         scope_str = "crypto";
         extension_str = "md5";
@@ -472,8 +477,8 @@ void Schemer::chibi_module_to_sexp(ChibiModule mod, sexp& mod_sexp)
         scope_str = "generic";
         break;
 
-    case ChibiModule::ChibiHeap:
-        scope_str = "heap";
+    case ChibiModule::ChibiHeapStats:
+        scope_str = "heap-stats";
         break;
 
     case ChibiModule::ChibiIo:
@@ -545,7 +550,7 @@ void Schemer::chibi_module_to_sexp(ChibiModule mod, sexp& mod_sexp)
         break;
 
     case ChibiModule::ChibiParse:
-        scope_str = "parser";
+        scope_str = "parse";
         break;
 
     case ChibiModule::ChibiPathname:
@@ -594,10 +599,6 @@ void Schemer::chibi_module_to_sexp(ChibiModule mod, sexp& mod_sexp)
 
     case ChibiModule::ChibiTrace:
         scope_str = "trace";
-        break;
-
-    case ChibiModule::ChibiType:
-        scope_str = "type";
         break;
 
     case ChibiModule::ChibiUri:

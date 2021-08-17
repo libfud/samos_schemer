@@ -4,5 +4,5 @@ add_samos_target(
     test/test_kelyphos.cpp
     EXTRA_LIBS chibi-scheme
     EXTRA_INCS chibi-scheme
-    SAMOS_DEPS EdLine Scheme
+    SAMOS_DEPS EdLine Scheme ConfigManager
     )

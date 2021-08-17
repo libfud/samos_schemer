@@ -46,11 +46,6 @@ using SexpCVVar = std::variant<
 
 };
 
-class SexpCppValue : public detail::SexpCVVar
-{
-    using detail::SexpCVVar::variant;
-};
-
 class OpRegistrationError
 {
 public:
@@ -162,6 +157,7 @@ using SchemeErrVariant = std::variant<
     BadTypeError,
     AssocKeyNotFound,
     SchemeException>;
+
 }
 
 class SchemerError : public detail::SchemeErrVariant
@@ -198,6 +194,23 @@ public:
         {
             assert(std::holds_alternative<AssocKeyNotFound>(*this));
             return std::get<AssocKeyNotFound>(*this).format();
+        }
+    }
+};
+
+class SexpCppValue : public detail::SexpCVVar
+{
+    using detail::SexpCVVar::variant;
+public:
+    result::Result<bool, BadTypeError> get_bool()
+    {
+        if (std::holds_alternative<bool>(*this))
+        {
+            return result::Result<bool, BadTypeError>::ok(std::get<bool>(*this));
+        }
+        else
+        {
+            return result::Result<bool, BadTypeError>::err(BadTypeError{});
         }
     }
 };

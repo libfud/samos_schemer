@@ -7,13 +7,6 @@
 #include <chibi/eval.h>
 
 extern "C" {
-sexp add_one(sexp ctx, sexp self, sexp n, sexp arg1);
-
-int foo();
-int bar(int x);
-
-sexp sexp_foo_stub(sexp ctx, sexp self, sexp_sint_t n);
-sexp sexp_bar_stub(sexp ctx, sexp self, sexp_sint_t n, sexp arg0);
 sexp sexp_ed_enable_history_stub(sexp ctx, sexp self, sexp_sint_t n, sexp arg0);
 sexp sexp_ed_disable_history_stub(sexp ctx, sexp self, sexp_sint_t n, sexp arg0);
 }

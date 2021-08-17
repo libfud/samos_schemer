@@ -1,44 +1,10 @@
 #include "kelyphos.hpp"
 #include "logger.hpp"
+#include "config_manager.hpp"
 
 #include <chibi/sexp.h>
 #include <fmt/core.h>
 #include <string>
-
-int foo()
-{
-    return 42;
-}
-
-sexp sexp_foo_stub(sexp ctx, sexp self, sexp_sint_t n)
-{
-    sexp res;
-
-    (void)self;
-    (void)n;
-
-    res = sexp_make_integer(ctx, foo());
-    return res;
-}
-
-int bar(int x)
-{
-    return x * 2;
-}
-
-sexp sexp_bar_stub(sexp ctx, sexp self, sexp_sint_t n, sexp arg0)
-{
-    sexp res;
-
-    (void)n;
-
-    if (!sexp_exact_integerp(arg0))
-    {
-        return sexp_type_exception(ctx, self, SEXP_FIXNUM, arg0);
-    }
-    res = sexp_make_integer(ctx, bar(sexp_sint_value(arg0)));
-    return res;
-}
 
 sexp sexp_ed_enable_history_stub(sexp ctx, sexp self, sexp_sint_t n, sexp arg0)
 {
@@ -82,6 +48,42 @@ Kelyphos::Kelyphos(ed_line::EdLine* editor)
     ed_pod{editor},
     schemer{}
 {
+    config_manager::ConfigMap kelyphos_options;
+    config_manager::ConfigMap loadout_map;
+
+    std::vector<std::pair<std::string, config_manager::ConfigValue>> conf_pairs{
+        std::make_pair("ed-enable-history", true),
+    };
+
+    auto register_res = kelyphos_options.register_properties(std::move(conf_pairs));
+
+    assert(register_res.is_ok());
+    config_manager::ConfigNest kelyphos_config("kelyphos", kelyphos_options);
+    config_manager::ConfigManager config_manager(kelyphos_config);
+
+    auto map_res = config_manager.load_config_from_file("data/config/kelyphos.cfg.scm");
+
+    if (map_res.is_ok())
+    {
+        kelyphos_options = map_res.get_ok();
+    }
+
+    auto enable_history_res = kelyphos_options.pop_property("ed-enable-history");
+
+    assert(enable_history_res.is_ok());
+    auto enable_history_var = enable_history_res.get_ok();
+
+    assert(std::holds_alternative<scheme::SexpCppValue>(enable_history_var));
+    auto enable_history_res2 = std::get<scheme::SexpCppValue>(enable_history_var).get_bool();
+
+    assert(enable_history_res2.is_ok());
+    auto enable_history = enable_history_res2.get_ok();
+
+    if (enable_history)
+    {
+        editor->enable_history();
+    }
+
     // FIXME CHECK RESULTS
     auto sexp_res = schemer.register_c_type<EdLinePOD>();
     sexp sexp_EdLinePOD_type;
@@ -103,19 +105,6 @@ Kelyphos::Kelyphos(ed_line::EdLine* editor)
         throw "Failed to register type in Kelyphos!";
     }
 
-    res = schemer.define_ffi_op(
-        "foo",
-        sexp_make_fixnum(SEXP_FIXNUM),
-        {},
-        sexp_foo_stub
-    );
-
-    res = schemer.define_ffi_op(
-        "bar",
-        sexp_make_fixnum(SEXP_FIXNUM),
-        {sexp_make_fixnum(SEXP_FIXNUM)},
-        sexp_bar_stub
-    );
     res = schemer.define_ffi_op(
         "ed-enable-history",
         SEXP_VOID,

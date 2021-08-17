@@ -135,6 +135,8 @@ public:
 
     [[nodiscard]] ConfigResult<bool> property_is_nested_map(const std::string& key) const;
 
+    [[nodiscard]] const std::set<std::string>& keys() const;
+
 private:
 
     std::unordered_map<std::string, ConfigValue> config_map;

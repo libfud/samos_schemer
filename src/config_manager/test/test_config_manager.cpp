@@ -314,6 +314,7 @@ TEST(TestConfigNest, TestConstructors)
 TEST(TestConfigManager, TestLoadConfig)
 {
     set_level(LogLevel::Info);
+
     /*
      * ((test-cfg . ((bool-prop . false)
      *               (int-prop . 42)
@@ -344,12 +345,14 @@ TEST(TestConfigManager, TestLoadConfig)
     ConfigManager manager(root);
 
     auto map_res = manager.load_config_from_file("data/tests/test_config.scm");
+
     if (map_res.is_err())
     {
         fmt::print("{}\n", map_res.get_err().format());
     }
     ASSERT_TRUE(map_res.is_ok());
     auto new_config = map_res.get_ok();
+
     ASSERT_TRUE(new_config.has_property("int-prop"));
     ASSERT_TRUE(new_config.has_property("float-prop"));
     ASSERT_TRUE(new_config.has_property("string-prop"));
